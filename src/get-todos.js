@@ -15,7 +15,12 @@ class TodoParser {
 
   // Returns true if string s is a todo-item
   #isTodo(s) {
-    const r = new RegExp(`\\s*[${this.bulletSymbols.join("")}] \\[[^xX-]\\].*`, "g"); // /\s*[-*+] \[[^xX-]\].*/g;
+    const r = new RegExp(`\\s*[${this.bulletSymbols.join("")}] \\[[^xX\\-\\>]\\].*`, "g"); // /\s*[-*+] \[[^xX-]\].*/g;
+    return r.test(s);
+  }
+
+  #isList(s) {
+    const r = new RegExp(/- (?!.*\[[^\]]+\]).*$/gm);
     return r.test(s);
   }
 
@@ -65,7 +70,7 @@ class TodoParser {
         todos.push(line);
         if (this.#withChildren && this.#hasChildren(l)) {
           const cs = this.#getChildren(l);
-          todos = [...todos, ...cs];
+          todos = [...todos, ...cs.filter(o => this.#isTodo(o) || this.#isList(o))];
           l += cs.length;
         }
       }

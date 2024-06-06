@@ -33,7 +33,7 @@ test("single done todo element should not return itself", () => {
   const result = getTodos({ lines });
 
   // THEN
-  const todos = [""];
+  const todos = [];
   expect(result).toStrictEqual(todos);
 });
 
@@ -45,7 +45,7 @@ test("single canceled todo element should not return itself", () => {
   const result = getTodos({ lines });
 
   // THEN
-  const todos = [""];
+  const todos = [];
   expect(result).toStrictEqual(todos);
 });
 
@@ -296,6 +296,23 @@ test("get todos doesn't add intermediate other elements", () => {
     "- [ ] Another one",
     "    - [ ] More children",
     "    - another child",
+  ];
+  expect(todos).toStrictEqual(result);
+});
+
+test("single forward todo element should not return itself", () => {
+  // GIVEN
+  const lines = [
+    "- [ ] TODO",
+    "- [>] FORWARDED",
+  ];
+
+  // WHEN
+  const todos = getTodos({ lines });
+
+  // THEN
+  const result = [
+    "- [ ] TODO",
   ];
   expect(todos).toStrictEqual(result);
 });

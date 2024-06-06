@@ -46,6 +46,7 @@ export default class RolloverTodosPlugin extends Plugin {
       removeEmptyTodos: false,
       rolloverChildren: false,
       rolloverOnFileCreate: true,
+      forwardOnComplete: false,
     };
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
@@ -126,6 +127,7 @@ export default class RolloverTodosPlugin extends Plugin {
     return getTodos({
       lines: dnLines,
       withChildren: this.settings.rolloverChildren,
+      forwardOnComplete: this.settings.forwardOnComplete,
     });
   }
 
@@ -195,7 +197,7 @@ export default class RolloverTodosPlugin extends Plugin {
         10000
       );
     } else {
-      const { templateHeading, deleteOnComplete, removeEmptyTodos } =
+      const { templateHeading, deleteOnComplete, removeEmptyTodos, forwardOnComplete } =
         this.settings;
 
       // check if there is a daily note from yesterday
@@ -283,7 +285,7 @@ export default class RolloverTodosPlugin extends Plugin {
       }
 
       // if deleteOnComplete, get yesterday's content and modify it
-      if (deleteOnComplete) {
+      if (deleteOnComplete || forwardOnComplete) {
         let lastDailyNoteContent = await this.app.vault.read(lastDailyNote);
         undoHistoryInstance.previousDay = {
           file: lastDailyNote,
@@ -293,7 +295,10 @@ export default class RolloverTodosPlugin extends Plugin {
 
         for (let i = lines.length; i >= 0; i--) {
           if (todos_yesterday.includes(lines[i])) {
-            lines.splice(i, 1);
+            if (deleteOnComplete)
+                lines.splice(i, 1);
+            else if (forwardOnComplete)
+                lines[i] = lines[i].replace('[ ]', '[>]')
           }
         }
 

@@ -115,5 +115,19 @@ export default class RolloverSettingTab extends PluginSettingTab {
             this.plugin.loadData().then((value) => console.log(value));
           })
       );
+
+    new Setting(this.containerEl)
+      .setName("Forward todos from previous day")
+      .setDesc(
+        `Similar to Delete todos from previous day, but instead of delete, the task status changed to forwarded [>]. Delete todos have higher precedence`
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.forwardOnComplete || false)
+          .onChange((value) => {
+            this.plugin.settings.forwardOnComplete = value
+            this.plugin.saveSettings();
+          })
+      );
   }
 }
